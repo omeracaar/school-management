@@ -16,7 +16,7 @@ import java.time.LocalDate;
 @Builder(toBuilder = true)
 public class ContactMessageResponse implements Serializable {
 
-    private String name;
+    private String name; // contactMessageName
     private String email;
     private String subject;
     private String message;

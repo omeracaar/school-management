@@ -6,17 +6,21 @@ import com.schoolmanagement.payload.request.ContactMessageRequest;
 import com.schoolmanagement.payload.response.ContactMessageResponse;
 import com.schoolmanagement.payload.response.ResponseMessage;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
 public class ContactMessageService {
 
     private final ContactMessageRepository contactMessageRepository;
-
 
     public ResponseMessage<ContactMessageResponse> save(ContactMessageRequest contactMessageRequest) {
 
@@ -34,14 +38,12 @@ public class ContactMessageService {
 
         return ResponseMessage.<ContactMessageResponse>builder()
                 .message("Contact Message Created Successfully")
-                .status(HttpStatus.CREATED) //httpstatus olmuyordu statusa cevirdim hata olabilir
+                .httpStatus(HttpStatus.CREATED)
                 .object(createResponse(savedData))
                 .build();
-
-
     }
 
-    // mapContactMessageRequestToContactMessage
+    // !!! mapContactMessageRequestToContactMessage
     private ContactMessage createContactMessage(ContactMessageRequest contactMessageRequest){
 
         return ContactMessage.builder()
@@ -53,6 +55,7 @@ public class ContactMessageService {
                 .build();
 
     }
+    // !!! mapContactMessageToContactMessageRequest
     private ContactMessageResponse createResponse(ContactMessage contactMessage){
 
         return ContactMessageResponse.builder()
@@ -63,4 +66,44 @@ public class ContactMessageService {
                 .date(LocalDate.now())
                 .build();
     }
+
+
+
+    // not: getAll() ***********************************************************
+    public Page<ContactMessageResponse> getAll(int page, int size, String sort, String type) {
+
+        // Pageable myPageable = PageRequest.of(page,size,Sort.by(type,sort) ;
+        Pageable pageable = PageRequest.of(page,size, Sort.by(sort).ascending());
+        if(Objects.equals(type,"desc")){
+            pageable = PageRequest.of(page,size, Sort.by(sort).descending());
+        }
+
+        return contactMessageRepository.findAll(pageable).map(this::createResponse);
+
+    }
+
+
+    // not: searchByEmail() ****************************************************
+    public Page<ContactMessageResponse> searchByEmail(String email, int page, int size, String sort, String type) {
+
+        Pageable pageable = PageRequest.of(page,size, Sort.by(sort).ascending());
+        if(Objects.equals(type,"desc")){
+            pageable = PageRequest.of(page,size, Sort.by(sort).descending());
+        }
+
+        return contactMessageRepository.findByEmailEquals(email, pageable).map(this::createResponse);
+    }
+
+    // not: searchBySubject() **************************************************
+    public Page<ContactMessageResponse> searchBySubject(String subject, int page, int size, String sort, String type) {
+
+        Pageable pageable = PageRequest.of(page,size, Sort.by(sort).ascending());
+        if(Objects.equals(type,"desc")){
+            pageable = PageRequest.of(page,size, Sort.by(sort).descending());
+        }
+
+        return contactMessageRepository.findBySubjectEquals(subject, pageable).map(this::createResponse);
+    }
+
+    // Odev : pageable yapilari helper mothod ile cagirilacak ( createPageableObject )
 }
