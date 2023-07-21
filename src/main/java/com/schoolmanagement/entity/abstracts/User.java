@@ -2,6 +2,8 @@ package com.schoolmanagement.entity.abstracts;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.schoolmanagement.entity.concretes.user.UserRole;
+import com.schoolmanagement.entity.enums.Gender;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -37,14 +39,17 @@ public abstract class User {
     private String birthPlace;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    private String password;
+    private String password; // hassas veri oldugu icin okuma islemlerinde kullanilmasin
 
     @Column(unique = true)
     private String phoneNumber;
 
-    // role
+    @OneToOne
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    private UserRole userRole;
 
-    // gender
+    @Enumerated(EnumType.STRING)
+    private Gender gender;
 
 
 }
