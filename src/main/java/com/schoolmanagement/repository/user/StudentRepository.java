@@ -1,9 +1,9 @@
 package com.schoolmanagement.repository.user;
 
-import com.schoolmanagement.entity.concretes.user.Admin;
+import com.schoolmanagement.entity.concretes.user.Student;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface AdminRepository extends JpaRepository<Admin, Long> {
+public interface StudentRepository extends JpaRepository<Student,Long> {
 
     boolean existsByUsername(String username);
 
@@ -11,5 +11,7 @@ public interface AdminRepository extends JpaRepository<Admin, Long> {
 
     boolean existsByPhoneNumber(String phone);
 
-    Admin findByUsernameEquals(String username);
+    boolean existsByEmail(String email);
+
+    Student findByUsernameEquals(String username);
 }
