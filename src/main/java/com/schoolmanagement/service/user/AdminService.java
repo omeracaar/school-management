@@ -11,10 +11,12 @@ import com.schoolmanagement.payload.request.AdminRequest;
 import com.schoolmanagement.payload.response.AdminResponse;
 import com.schoolmanagement.payload.response.ResponseMessage;
 import com.schoolmanagement.repository.user.AdminRepository;
+import com.schoolmanagement.service.helper.PageableHelper;
 import com.schoolmanagement.service.validator.UniquePropertyValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
@@ -29,6 +31,7 @@ public class AdminService {
     private final AdminMapper adminMapper;
     private final UserRoleService userRoleService;
     private final PageableHelper pageableHelper;
+    private final PasswordEncoder passwordEncoder;
 
     // Not : save() *************************************************************
     public ResponseMessage<AdminResponse> saveAdmin(AdminRequest adminRequest) {
@@ -48,7 +51,10 @@ public class AdminService {
         // !!! admin rolu veriliyor
         admin.setUserRole(userRoleService.getUserRole(RoleType.ADMIN));
 
+        admin.setPassword(passwordEncoder.encode(admin.getPassword())); // adminRequest.getPassword()
+
         // TODO : Password encode edilecek...
+
 
         Admin savedAdmin = adminRepository.save(admin);
 

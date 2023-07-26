@@ -9,4 +9,9 @@ public class SuccessMessages {
     // !!! Admin
     public static final String ADMIN_CREATE = "Admin is Saved Successfully";
     public static final String ADMIN_DELETE = "Admin is Deleted Successfully";
+
+    //!!!DEAN
+
+    public static final String DEAN_SAVE = "Dean is Saved Successfully";
+
 }

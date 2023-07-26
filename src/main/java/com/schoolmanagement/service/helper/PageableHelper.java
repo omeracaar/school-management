@@ -1,4 +1,4 @@
-package com.schoolmanagement.service.user;
+package com.schoolmanagement.service.helper;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
