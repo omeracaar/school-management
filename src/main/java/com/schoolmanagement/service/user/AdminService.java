@@ -50,11 +50,9 @@ public class AdminService {
 
         // !!! admin rolu veriliyor
         admin.setUserRole(userRoleService.getUserRole(RoleType.ADMIN));
-
+        System.out.println(admin.getPassword());
         admin.setPassword(passwordEncoder.encode(admin.getPassword())); // adminRequest.getPassword()
-
-        // TODO : Password encode edilecek...
-
+        System.out.println(admin.getPassword());
 
         Admin savedAdmin = adminRepository.save(admin);
 

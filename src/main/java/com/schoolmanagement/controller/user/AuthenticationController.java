@@ -19,10 +19,9 @@ public class AuthenticationController {
 
     private final AuthenticationService authenticationService;
 
-    @PostMapping("/login") //http://localhost:8080/auth/login + POST
+    @PostMapping("/login") // http://localhost:8080/auth/login   + POST
     public ResponseEntity<AuthResponse> authenticateUser(@RequestBody @Valid LoginRequest loginRequest){
 
         return authenticationService.authenticateUser(loginRequest);
     }
-
 }

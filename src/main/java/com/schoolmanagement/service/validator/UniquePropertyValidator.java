@@ -1,7 +1,15 @@
 package com.schoolmanagement.service.validator;
 
+import com.schoolmanagement.entity.abstracts.User;
+import com.schoolmanagement.entity.concretes.user.Dean;
+import com.schoolmanagement.entity.concretes.user.Student;
+import com.schoolmanagement.entity.concretes.user.Teacher;
 import com.schoolmanagement.exception.ConflictException;
 import com.schoolmanagement.payload.messages.ErrorMessages;
+import com.schoolmanagement.payload.request.DeanRequest;
+import com.schoolmanagement.payload.request.StudentRequest;
+import com.schoolmanagement.payload.request.TeacherRequest;
+import com.schoolmanagement.payload.request.abstracts.BaseUserRequest;
 import com.schoolmanagement.repository.user.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -15,6 +23,53 @@ public class UniquePropertyValidator {
     private final StudentRepository studentRepository;
     private final TeacherRepository teacherRepository;
     private final ViceDeanRepository viceDeanRepository;
+
+    public void checkUniqueProperties(User user, BaseUserRequest baseUserRequest){
+
+        String updatedUsername = "";
+        String updatedSsn = "";
+        String updatedPhone = "";
+        String updatedEmail = "";
+
+        if(!user.getUsername().equalsIgnoreCase(baseUserRequest.getUsername())) {
+            updatedUsername = baseUserRequest.getUsername();
+        }
+
+        if(!user.getSsn().equalsIgnoreCase(baseUserRequest.getSsn())){
+            updatedSsn = baseUserRequest.getSsn();
+        }
+
+        if(!user.getPhoneNumber().equalsIgnoreCase(baseUserRequest.getPhoneNumber())){
+            updatedPhone = baseUserRequest.getPhoneNumber();
+        }
+
+        boolean teacherOrStudent = false ;
+
+        if(user instanceof Teacher && baseUserRequest instanceof TeacherRequest){
+            Teacher teacher = (Teacher) user;
+            TeacherRequest teacherRequest = (TeacherRequest) baseUserRequest;
+            teacherOrStudent = true;
+            if(!teacher.getEmail().equalsIgnoreCase(teacherRequest.getEmail())){
+                updatedEmail = teacherRequest.getEmail();
+            }
+        }
+
+        if(user instanceof Student && baseUserRequest instanceof StudentRequest){
+            Student student = (Student) user;
+            StudentRequest studentRequest = (StudentRequest) baseUserRequest;
+            teacherOrStudent = true;
+            if(!student.getEmail().equalsIgnoreCase(studentRequest.getEmail())){
+                updatedEmail = studentRequest.getEmail();
+            }
+
+        }
+        if(teacherOrStudent) {
+            checkDuplicate(updatedUsername,updatedSsn,updatedPhone,updatedEmail);
+        } else {
+            checkDuplicate(updatedUsername,updatedSsn,updatedPhone);
+        }
+    }
+
 
     public void checkDuplicate(String... values) {
 
