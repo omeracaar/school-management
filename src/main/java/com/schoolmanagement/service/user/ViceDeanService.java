@@ -10,13 +10,18 @@ import com.schoolmanagement.payload.request.ViceDeanRequest;
 import com.schoolmanagement.payload.response.ResponseMessage;
 import com.schoolmanagement.payload.response.ViceDeanResponse;
 import com.schoolmanagement.repository.user.ViceDeanRepository;
+import com.schoolmanagement.service.helper.PageableHelper;
 import com.schoolmanagement.service.validator.UniquePropertyValidator;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +32,7 @@ public class ViceDeanService {
     private final ViceDeanMapper viceDeanMapper;
     private final PasswordEncoder passwordEncoder;
     private final UserRoleService userRoleService;
+    private final PageableHelper pageableHelper;
 
     // Not :  Save() *************************************************************************
     public ResponseMessage<ViceDeanResponse> saveViceDean(ViceDeanRequest viceDeanRequest) {
@@ -77,5 +83,43 @@ public class ViceDeanService {
         } else {
             return viceDean;
         }
+    }
+
+    public ResponseMessage deleteViceDeanByUserId(Long viceDeanId) {
+
+        Optional<ViceDean> viceDean= isViceDeanExist(viceDeanId);
+        viceDeanRepository.deleteById(viceDeanId);
+
+        return ResponseMessage.builder()
+              .message(SuccessMessages.VICE_DEAN_DELETE)
+              .httpStatus(HttpStatus.OK)
+              .build();
+    }
+
+
+    // Not :  getById() ************************************************************************
+    public ResponseMessage<ViceDeanResponse> getViceDeanByViceDeanId(Long viceDeanId) {
+
+        return ResponseMessage.<ViceDeanResponse>builder()
+                .message(SuccessMessages.VICE_DEAN_FOUND)
+                .httpStatus(HttpStatus.OK)
+                .object(viceDeanMapper.mapViceDeanToViceDeanResponse(isViceDeanExist(viceDeanId).get()))
+                .build();
+    }
+    // Not :  getAll() *************************************************************************
+    public List<ViceDeanResponse> getAllViceDeans() {
+
+        return viceDeanRepository.findAll() // List<ViceDean>
+                .stream() // Stream<ViceDean>
+                .map(viceDeanMapper::mapViceDeanToViceDeanResponse) // Stream<ViceDeanResponse>
+                .collect(Collectors.toList()); // List<ViceDeanResponse>
+    }
+
+    // Not :  getAllWithPage() ******************************************************************
+    public Page<ViceDeanResponse> getAllViceDeanByPage(int page, int size, String sort, String type) {
+
+        Pageable pageable = pageableHelper.getPageableWithProperties(page,size,sort,type);
+
+        return viceDeanRepository.findAll(pageable).map(viceDeanMapper::mapViceDeanToViceDeanResponse);
     }
 }
