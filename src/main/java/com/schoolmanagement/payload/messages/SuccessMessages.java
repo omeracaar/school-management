@@ -22,5 +22,12 @@ public class SuccessMessages {
     public static final String VICE_DEAN_DELETE = "Vice Dean is Deleted Successfully";
     public static final String VICE_DEAN_FOUND = "Vice Dean is Found Successfully";
 
+    //!!! EducationTerm
+    public static final String EDUCATION_TERM_SAVE = "Education Term is Saved Successfully";
+    public static final String EDUCATION_TERM_DELETE = "Education Term is Deleted Successfully";
+    public static final String EDUCATION_TERM_UPDATE = "Education Term is Updated Successfully";
+
+
+
 
 }
