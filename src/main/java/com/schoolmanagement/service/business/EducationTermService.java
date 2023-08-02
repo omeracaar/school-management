@@ -105,7 +105,6 @@ public class EducationTermService {
                 .build();
     }
 
-
     // Not: updateById() *********************************************************************
     public ResponseMessage<EducationTermResponse> updateEducationTerm(Long id, EducationTermRequest educationTermRequest) {
         // !!! id var mi ???
@@ -124,5 +123,10 @@ public class EducationTermService {
                 .object(educationTermMapper.mapEducationTermToEducationTermResponse(educationTermUpdated))
                 .build();
 
+    }
+
+    //Not: LessonProgramService
+    public EducationTerm getEducationTermById(Long id) {
+        return isEducationTermExist(id);
     }
 }

@@ -33,5 +33,10 @@ public class SuccessMessages {
     public static final String LESSON_FOUND = "Lesson is Found Successfully";
     public static final String LESSON_UPDATE = "Lesson is Updated Successfully";
 
+    // !!! LessonProgram
+    public static final String LESSON_PROGRAM_SAVE = "Lesson Program is Saved Successfully";
+
+
+
 
 }
