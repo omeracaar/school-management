@@ -50,5 +50,6 @@ public class LessonProgramService {
                 .object(lessonProgramMapper.mapLessonProgramToLessonProgramResponse(savedLessonProgram))
                 .build();
 
+
     }
 }
