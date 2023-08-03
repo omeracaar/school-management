@@ -16,7 +16,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -24,7 +26,7 @@ public class LessonProgramService {
 
     private final LessonProgramRepository lessonProgramRepository;
     private final LessonService lessonService;
-    private  final EducationTermService educationTermService;
+    private final EducationTermService educationTermService;
     private final DateTimeValidator dateTimeValidator;
     private final LessonProgramMapper lessonProgramMapper;
 
@@ -35,14 +37,14 @@ public class LessonProgramService {
         // !!! EducationTerm
         EducationTerm educationTerm = educationTermService.getEducationTermById(lessonProgramRequest.getEducationTermId());
         // !!! yukarda gelen lessons in icinin bos olma kontrolu
-        if(lessons.isEmpty()){
+        if (lessons.isEmpty()) {
             throw new ResourceNotFoundException(ErrorMessages.NOT_FOUND_LESSON_IN_LIST_MESSAGE);
         }
         // !!! zaman kontrolu
         dateTimeValidator.checkTimeWithException(lessonProgramRequest.getStartTime(), lessonProgramRequest.getStopTime());
         // !!!  DTO --> POJO
-        LessonProgram lessonProgram = lessonProgramMapper.mapLessonProgramRequestToLessonProgram(lessonProgramRequest,lessons,educationTerm);
-        LessonProgram savedLessonProgram =  lessonProgramRepository.save(lessonProgram);
+        LessonProgram lessonProgram = lessonProgramMapper.mapLessonProgramRequestToLessonProgram(lessonProgramRequest, lessons, educationTerm);
+        LessonProgram savedLessonProgram = lessonProgramRepository.save(lessonProgram);
 
         return ResponseMessage.<LessonProgramResponse>builder()
                 .message(SuccessMessages.LESSON_PROGRAM_SAVE)
@@ -52,4 +54,57 @@ public class LessonProgramService {
 
 
     }
+
+    public List<LessonProgramResponse> getAllLessonProgramByList() {
+
+        return lessonProgramRepository.findAll()
+                .stream()
+                .map(lessonProgramMapper::mapLessonProgramToLessonProgramResponse)
+                .collect(Collectors.toList());
+    }
+
+    // Not : getById() *********************************************************************
+    public LessonProgramResponse getLessonProgramById(Long id) {
+
+        LessonProgram lessonProgram = isLessonProgramExistById(id);
+
+        return lessonProgramMapper.mapLessonProgramToLessonProgramResponse(lessonProgram);
+    }
+
+    private LessonProgram isLessonProgramExistById(Long id){
+
+        return lessonProgramRepository.findById(id).orElseThrow(()->
+                new ResourceNotFoundException(String.format(ErrorMessages.NOT_FOUND_LESSON_PROGRAM_MESSAGE, id)));
+    }
+
+    // Not : getAllLessonProgramUnassigned() ************************************************
+    public List<LessonProgramResponse> getAllLessonProgramUnassogned() {
+
+       return lessonProgramRepository.findByTeachers_IdNull()
+                .stream()
+                .map(lessonProgramMapper::mapLessonProgramToLessonProgramResponse)
+                .collect(Collectors.toList());
+    }
+
+    // Not : getAllLessonProgramAssigned() **************************************************
+    public List<LessonProgramResponse> getAllAssigned() {
+
+        return lessonProgramRepository.findByTeachers_IdNotNull()
+                .stream()
+                .map(lessonProgramMapper::mapLessonProgramToLessonProgramResponse)
+                .collect(Collectors.toList());
+    }
+    // Not : delete() **************************************************
+
+    public ResponseMessage deleteLessonProgramById(Long id) {
+        isLessonProgramExistById(id);
+        lessonProgramRepository.deleteById(id);
+
+        return ResponseMessage.builder()
+                .message(SuccessMessages.LESSON_PROGRAM_DELETE)
+                .httpStatus(HttpStatus.OK)
+                .build();
+    }
+
+
 }

@@ -3,15 +3,17 @@ package com.schoolmanagement.controller.business;
 import com.schoolmanagement.payload.request.LessonProgramRequest;
 import com.schoolmanagement.payload.response.LessonProgramResponse;
 import com.schoolmanagement.payload.response.ResponseMessage;
+import com.schoolmanagement.repository.business.LessonProgramRepository;
 import com.schoolmanagement.service.business.LessonProgramService;
+import com.schoolmanagement.service.helper.PageableHelper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping("/lessonPrograms")
@@ -27,4 +29,60 @@ public class LessonProgramController {
 
         return lessonProgramService.saveLessonProgram(lessonProgramRequest);
     }
+    // Not : getAll() **********************************************************************
+    @PreAuthorize("hasAnyAuthority('ADMIN','MANAGER','ASSISTANT_MANAGER','STUDENT','TEACHER')")
+    @GetMapping("/getAll") // http://localhost:8080/lessonPrograms/getAll   + GET
+    public List<LessonProgramResponse> getAllLessonProgramByList(){
+
+        return lessonProgramService.getAllLessonProgramByList();
+    }
+
+    // Not : getById() *********************************************************************
+    @PreAuthorize("hasAnyAuthority('ADMIN','MANAGER','ASSISTANT_MANAGER','STUDENT','TEACHER')")
+    @GetMapping("/getById/{id}") // http://localhost:8080/lessonPrograms/getById/{id}   + GET
+    public LessonProgramResponse getLessonProgramById(@PathVariable Long id){
+
+        return lessonProgramService.getLessonProgramById(id);
+    }
+
+    // Not : getAllLessonProgramUnassigned() ************************************************
+    @PreAuthorize("hasAnyAuthority('ADMIN','MANAGER','ASSISTANT_MANAGER','STUDENT','TEACHER')")
+    @GetMapping("/getAllUnassigned")  // http://localhost:8080/lessonPrograms/getAllUnassigned  + GET
+    public List<LessonProgramResponse> getAllUnassigned(){
+
+        return lessonProgramService.getAllLessonProgramUnassogned();
+    }
+
+    // Not : getAllLessonProgramAssigned() **************************************************
+    @PreAuthorize("hasAnyAuthority('ADMIN','MANAGER','ASSISTANT_MANAGER','STUDENT','TEACHER')")
+    @GetMapping("/getAllAsigned")  // http://localhost:8080/lessonPrograms/getAllUnassigned  + GET
+    public List<LessonProgramResponse> getAllAsigned(){
+
+        return lessonProgramService.getAllAssigned();
+    }
+
+    // Not : Delete() ***********************************************************************
+    @PreAuthorize("hasAnyAuthority('ADMIN','MANAGER','ASSISTANT_MANAGER')")
+    @DeleteMapping("/delete/{id}")  // http://localhost:8080/lessonPrograms/delete/2  + DELETE
+    public ResponseMessage deleteLessonProgramById(@PathVariable Long id){
+        return lessonProgramService.deleteLessonProgramById(id);
+    }
+
+    // Not :  getAllWithPage() ***************************************************************
+
+    // Not :  getAllWithPage() ***************************************************************
+    @PreAuthorize("hasAnyAuthority('ADMIN','MANAGER','ASSISTANT_MANAGER','STUDENT','TEACHER')")
+    @GetMapping("/getAllLessonProgramByPage") // http://localhost:8080/lessonPrograms/getAllLessonProgramByPage?page=0&size=1&sort=id&type=desc
+    public Page<LessonProgramResponse> getAllLessonProgramByPage(
+            @RequestParam(value = "page") int page,
+            @RequestParam(value = "size") int size,
+            @RequestParam(value = "sort") String sort,
+            @RequestParam(value = "type") String type
+    ){
+        return lessonProgramService.getAllLessonProgramByPage(page,size,sort,type);
+    }
+
+    // Not : getLessonProgramByTeacher() *****************************************************
+
+    // Not :  getLessonProgramByStudent() *****************************************************
 }

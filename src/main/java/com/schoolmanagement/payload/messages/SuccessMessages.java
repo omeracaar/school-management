@@ -31,10 +31,11 @@ public class SuccessMessages {
     public static final String LESSON_SAVE = "Lesson is Saved Successfully";
     public static final String LESSON_DELETE = "Lesson is Deleted Successfully";
     public static final String LESSON_FOUND = "Lesson is Found Successfully";
-    public static final String LESSON_UPDATE = "Lesson is Updated Successfully";
 
     // !!! LessonProgram
     public static final String LESSON_PROGRAM_SAVE = "Lesson Program is Saved Successfully";
+    public static final String LESSON_PROGRAM_DELETE = "Lesson Program is Deleted Successfully";
+
 
 
 
