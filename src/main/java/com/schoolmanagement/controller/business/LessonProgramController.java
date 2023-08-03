@@ -94,4 +94,9 @@ public class LessonProgramController {
     }
 
     // Not :  getLessonProgramByStudent() *****************************************************
+    @PreAuthorize("hasAnyAuthority('STUDENT')")
+    @GetMapping("/getAllLessonProgramByStudent") // http://localhost:8080/lessonPrograms/getAllLessonProgramByStudent  + GET
+    public Set<LessonProgramResponse> getAllLessonProgramByStudent(HttpServletRequest httpServletRequest){
+        return lessonProgramService.getAllLessonProgramByStudent(httpServletRequest);
+    }
 }

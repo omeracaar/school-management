@@ -30,10 +30,11 @@ public class LessonProgramService {
 
     private final LessonProgramRepository lessonProgramRepository;
     private final LessonService lessonService;
-    private final EducationTermService educationTermService;
+    private  final EducationTermService educationTermService;
     private final DateTimeValidator dateTimeValidator;
     private final LessonProgramMapper lessonProgramMapper;
-	private final PageableHelper pageableHelper;
+    private final PageableHelper pageableHelper;
+
     // Not :  Save() *********************************************************
     public ResponseMessage<LessonProgramResponse> saveLessonProgram(LessonProgramRequest lessonProgramRequest) {
         //!!! LessonProgramda olacak dersleri LessonService den getiriyorum
@@ -41,14 +42,14 @@ public class LessonProgramService {
         // !!! EducationTerm
         EducationTerm educationTerm = educationTermService.getEducationTermById(lessonProgramRequest.getEducationTermId());
         // !!! yukarda gelen lessons in icinin bos olma kontrolu
-        if (lessons.isEmpty()) {
+        if(lessons.isEmpty()){
             throw new ResourceNotFoundException(ErrorMessages.NOT_FOUND_LESSON_IN_LIST_MESSAGE);
         }
         // !!! zaman kontrolu
         dateTimeValidator.checkTimeWithException(lessonProgramRequest.getStartTime(), lessonProgramRequest.getStopTime());
         // !!!  DTO --> POJO
-        LessonProgram lessonProgram = lessonProgramMapper.mapLessonProgramRequestToLessonProgram(lessonProgramRequest, lessons, educationTerm);
-        LessonProgram savedLessonProgram = lessonProgramRepository.save(lessonProgram);
+        LessonProgram lessonProgram = lessonProgramMapper.mapLessonProgramRequestToLessonProgram(lessonProgramRequest,lessons,educationTerm);
+        LessonProgram savedLessonProgram =  lessonProgramRepository.save(lessonProgram);
 
         return ResponseMessage.<LessonProgramResponse>builder()
                 .message(SuccessMessages.LESSON_PROGRAM_SAVE)
@@ -56,14 +57,14 @@ public class LessonProgramService {
                 .object(lessonProgramMapper.mapLessonProgramToLessonProgramResponse(savedLessonProgram))
                 .build();
 
-
     }
 
+    // Not : getAll() **********************************************************************
     public List<LessonProgramResponse> getAllLessonProgramByList() {
 
-        return lessonProgramRepository.findAll()
-                .stream()
-                .map(lessonProgramMapper::mapLessonProgramToLessonProgramResponse)
+        return lessonProgramRepository.findAll() // List<LessonProgram>
+                .stream() // Stream<LessonProgram>
+                .map(lessonProgramMapper::mapLessonProgramToLessonProgramResponse) // Steam<LessonProgramResponse>
                 .collect(Collectors.toList());
     }
 
@@ -82,9 +83,9 @@ public class LessonProgramService {
     }
 
     // Not : getAllLessonProgramUnassigned() ************************************************
-    public List<LessonProgramResponse> getAllLessonProgramUnassogned() {
+    public List<LessonProgramResponse> getAllLessonProgramUnassigned() {
 
-       return lessonProgramRepository.findByTeachers_IdNull()
+        return lessonProgramRepository.findByTeachers_IdNull() // List<LessonProgram>
                 .stream()
                 .map(lessonProgramMapper::mapLessonProgramToLessonProgramResponse)
                 .collect(Collectors.toList());
@@ -98,7 +99,6 @@ public class LessonProgramService {
                 .map(lessonProgramMapper::mapLessonProgramToLessonProgramResponse)
                 .collect(Collectors.toList());
     }
-    // Not : delete() **************************************************
 
     // Not : Delete() ***********************************************************************
     public ResponseMessage deleteLessonProgramById(Long id) {
@@ -110,7 +110,6 @@ public class LessonProgramService {
                 .httpStatus(HttpStatus.OK)
                 .build();
     }
-
     // Not :  getAllWithPage() ***************************************************************
     public Page<LessonProgramResponse> getAllLessonProgramByPage(int page, int size, String sort, String type) {
 
@@ -118,8 +117,24 @@ public class LessonProgramService {
         return lessonProgramRepository.findAll(pageable).map(lessonProgramMapper::mapLessonProgramToLessonProgramResponse);
     }
 
-	//Not: getLessonProgramByTeacher() ********************************************************
+    // Not : getLessonProgramByTeacher() *****************************************************
     public Set<LessonProgramResponse> getAllLessonProgramByTeacher(HttpServletRequest httpServletRequest) {
-        //Request uzerinden login olan kullanicinin
+        // Request uzerinden login olan kullanicinin username bilgisini aliyorum
+        String userName = (String) httpServletRequest.getAttribute("username");
+        return lessonProgramRepository.getLessonProgramByTeacherUsername(userName) // Set<LessonProgram>
+                .stream()
+                .map(lessonProgramMapper::mapLessonProgramToLessonProgramResponse) // Stream<LessonProgramResponse>
+                .collect(Collectors.toSet());
+
+    }
+    // Not :  getLessonProgramByStudent() *****************************************************
+    public Set<LessonProgramResponse> getAllLessonProgramByStudent(HttpServletRequest httpServletRequest) {
+
+        String userName = (String) httpServletRequest.getAttribute("username");
+
+        return lessonProgramRepository.getLessonProgramByStudentsUsername(userName)
+                .stream()
+                .map(lessonProgramMapper::mapLessonProgramToLessonProgramResponse)
+                .collect(Collectors.toSet());
     }
 }
