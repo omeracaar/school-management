@@ -11,11 +11,15 @@ import com.schoolmanagement.payload.request.LessonProgramRequest;
 import com.schoolmanagement.payload.response.LessonProgramResponse;
 import com.schoolmanagement.payload.response.ResponseMessage;
 import com.schoolmanagement.repository.business.LessonProgramRepository;
+import com.schoolmanagement.service.helper.PageableHelper;
 import com.schoolmanagement.service.validator.DateTimeValidator;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -29,7 +33,7 @@ public class LessonProgramService {
     private final EducationTermService educationTermService;
     private final DateTimeValidator dateTimeValidator;
     private final LessonProgramMapper lessonProgramMapper;
-
+	private final PageableHelper pageableHelper;
     // Not :  Save() *********************************************************
     public ResponseMessage<LessonProgramResponse> saveLessonProgram(LessonProgramRequest lessonProgramRequest) {
         //!!! LessonProgramda olacak dersleri LessonService den getiriyorum
@@ -96,6 +100,7 @@ public class LessonProgramService {
     }
     // Not : delete() **************************************************
 
+    // Not : Delete() ***********************************************************************
     public ResponseMessage deleteLessonProgramById(Long id) {
         isLessonProgramExistById(id);
         lessonProgramRepository.deleteById(id);
@@ -106,5 +111,15 @@ public class LessonProgramService {
                 .build();
     }
 
+    // Not :  getAllWithPage() ***************************************************************
+    public Page<LessonProgramResponse> getAllLessonProgramByPage(int page, int size, String sort, String type) {
 
+        Pageable pageable =  pageableHelper.getPageableWithProperties(page,size,sort,type);
+        return lessonProgramRepository.findAll(pageable).map(lessonProgramMapper::mapLessonProgramToLessonProgramResponse);
+    }
+
+	//Not: getLessonProgramByTeacher() ********************************************************
+    public Set<LessonProgramResponse> getAllLessonProgramByTeacher(HttpServletRequest httpServletRequest) {
+        //Request uzerinden login olan kullanicinin
+    }
 }

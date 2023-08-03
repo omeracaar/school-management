@@ -12,8 +12,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/lessonPrograms")
@@ -83,6 +85,13 @@ public class LessonProgramController {
     }
 
     // Not : getLessonProgramByTeacher() *****************************************************
+    // Not : getLessonProgramByTeacher() *****************************************************
+    @PreAuthorize("hasAnyAuthority('TEACHER')")
+    @GetMapping("/getAllLessonProgramByTeacher") // http://localhost:8080/lessonPrograms/getAllLessonProgramByTeacher  + GET
+    public Set<LessonProgramResponse> getAllLessonProgramByTeacherUserName(HttpServletRequest httpServletRequest){
+
+        return lessonProgramService.getAllLessonProgramByTeacher(httpServletRequest);
+    }
 
     // Not :  getLessonProgramByStudent() *****************************************************
 }
