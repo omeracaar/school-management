@@ -3,12 +3,9 @@ package com.schoolmanagement.controller.business;
 import com.schoolmanagement.payload.request.LessonProgramRequest;
 import com.schoolmanagement.payload.response.LessonProgramResponse;
 import com.schoolmanagement.payload.response.ResponseMessage;
-import com.schoolmanagement.repository.business.LessonProgramRepository;
 import com.schoolmanagement.service.business.LessonProgramService;
-import com.schoolmanagement.service.helper.PageableHelper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,11 +37,11 @@ public class LessonProgramController {
     }
 
     // Not : getById() *********************************************************************
-    @PreAuthorize("hasAnyAuthority('ADMIN','MANAGER','ASSISTANT_MANAGER','STUDENT','TEACHER')")
-    @GetMapping("/getById/{id}") // http://localhost:8080/lessonPrograms/getById/{id}   + GET
-    public LessonProgramResponse getLessonProgramById(@PathVariable Long id){
+    @PreAuthorize("hasAnyAuthority('ADMIN','MANAGER','ASSISTANT_MANAGER')")
+    @GetMapping("/getById/{id}")  // http://localhost:8080/lessonPrograms/getById/1  +  GET
+    public LessonProgramResponse getLessonProgramById(@PathVariable Long id) {
 
-        return lessonProgramService.getLessonProgramById(id);
+        return  lessonProgramService.getLessonProgramById(id);
     }
 
     // Not : getAllLessonProgramUnassigned() ************************************************
@@ -52,13 +49,14 @@ public class LessonProgramController {
     @GetMapping("/getAllUnassigned")  // http://localhost:8080/lessonPrograms/getAllUnassigned  + GET
     public List<LessonProgramResponse> getAllUnassigned(){
 
-        return lessonProgramService.getAllLessonProgramUnassogned();
+        return lessonProgramService.getAllLessonProgramUnassigned();
     }
+
 
     // Not : getAllLessonProgramAssigned() **************************************************
     @PreAuthorize("hasAnyAuthority('ADMIN','MANAGER','ASSISTANT_MANAGER','STUDENT','TEACHER')")
-    @GetMapping("/getAllAsigned")  // http://localhost:8080/lessonPrograms/getAllUnassigned  + GET
-    public List<LessonProgramResponse> getAllAsigned(){
+    @GetMapping("/getAllAssigned")  // http://localhost:8080/lessonPrograms/getAllAssigned  + GET
+    public List<LessonProgramResponse> getAllAssigned(){
 
         return lessonProgramService.getAllAssigned();
     }
@@ -69,8 +67,6 @@ public class LessonProgramController {
     public ResponseMessage deleteLessonProgramById(@PathVariable Long id){
         return lessonProgramService.deleteLessonProgramById(id);
     }
-
-    // Not :  getAllWithPage() ***************************************************************
 
     // Not :  getAllWithPage() ***************************************************************
     @PreAuthorize("hasAnyAuthority('ADMIN','MANAGER','ASSISTANT_MANAGER','STUDENT','TEACHER')")
@@ -84,7 +80,6 @@ public class LessonProgramController {
         return lessonProgramService.getAllLessonProgramByPage(page,size,sort,type);
     }
 
-    // Not : getLessonProgramByTeacher() *****************************************************
     // Not : getLessonProgramByTeacher() *****************************************************
     @PreAuthorize("hasAnyAuthority('TEACHER')")
     @GetMapping("/getAllLessonProgramByTeacher") // http://localhost:8080/lessonPrograms/getAllLessonProgramByTeacher  + GET

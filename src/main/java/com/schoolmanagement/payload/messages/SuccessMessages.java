@@ -22,12 +22,12 @@ public class SuccessMessages {
     public static final String VICE_DEAN_DELETE = "Vice Dean is Deleted Successfully";
     public static final String VICE_DEAN_FOUND = "Vice Dean is Found Successfully";
 
-    //!!! EducationTerm
+    // !!! EducationTerm
     public static final String EDUCATION_TERM_SAVE = "Education Term is Saved Successfully";
     public static final String EDUCATION_TERM_DELETE = "Education Term is Deleted Successfully";
     public static final String EDUCATION_TERM_UPDATE = "Education Term is Updated Successfully";
 
-	//!!! Lesson
+    // !!! Lesson
     public static final String LESSON_SAVE = "Lesson is Saved Successfully";
     public static final String LESSON_DELETE = "Lesson is Deleted Successfully";
     public static final String LESSON_FOUND = "Lesson is Found Successfully";
@@ -36,8 +36,10 @@ public class SuccessMessages {
     public static final String LESSON_PROGRAM_SAVE = "Lesson Program is Saved Successfully";
     public static final String LESSON_PROGRAM_DELETE = "Lesson Program is Deleted Successfully";
 
-
-
-
+    //!!! Teacher
+    public static final String TEACHER_SAVE = "Teacher is Saved Successfully";
+    public static final String TEACHER_DELETE = "Teacher is Deleted Successfully";
+    public static final String TEACHER_FOUND = "Teacher is Found Successfully";
+    public static final String TEACHER_UPDATE = "Teacher is Updated Successfully";
 
 }

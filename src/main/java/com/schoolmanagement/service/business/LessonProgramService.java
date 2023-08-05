@@ -137,4 +137,21 @@ public class LessonProgramService {
                 .map(lessonProgramMapper::mapLessonProgramToLessonProgramResponse)
                 .collect(Collectors.toSet());
     }
+
+    // Not: TeacherService de kullanildi
+    public Set<LessonProgram> getLessonProgramById(Set<Long> lessonIdSet){
+
+        Set<LessonProgram> lessonPrograms = lessonProgramRepository.getLessonProgramByLessonProgramByIdList(lessonIdSet);
+
+        if(lessonPrograms.isEmpty()) {
+            throw new ResourceNotFoundException(ErrorMessages.NOT_FOUND_LESSON_PROGRAM_MESSAGE_WITHOUT_ID_INFO);
+        }
+
+        return lessonPrograms;
+
+        /* // Alternatif kod
+                lessonIdSet.forEach(this::isLessonProgramExistById);
+         */
+
+    }
 }
