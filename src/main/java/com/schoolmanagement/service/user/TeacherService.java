@@ -7,12 +7,15 @@ import com.schoolmanagement.exception.ResourceNotFoundException;
 import com.schoolmanagement.payload.mappers.TeacherMapper;
 import com.schoolmanagement.payload.messages.ErrorMessages;
 import com.schoolmanagement.payload.messages.SuccessMessages;
+import com.schoolmanagement.payload.request.ChooseLessonTeacherRequest;
 import com.schoolmanagement.payload.request.TeacherRequest;
 import com.schoolmanagement.payload.response.ResponseMessage;
 import com.schoolmanagement.payload.response.TeacherResponse;
 import com.schoolmanagement.repository.user.TeacherRepository;
+import com.schoolmanagement.service.business.AdvisoryTeacherService;
 import com.schoolmanagement.service.business.LessonProgramService;
 import com.schoolmanagement.service.helper.PageableHelper;
+import com.schoolmanagement.service.validator.DateTimeValidator;
 import com.schoolmanagement.service.validator.UniquePropertyValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -33,9 +36,12 @@ public class TeacherService {
     private final LessonProgramService lessonProgramService;
     private final UniquePropertyValidator uniquePropertyValidator;
     private final TeacherMapper teacherMapper;
-    private final  UserRoleService userRoleService ;
+    private final UserRoleService userRoleService;
     private final PasswordEncoder passwordEncoder;
     private final PageableHelper pageableHelper;
+    private final DateTimeValidator dateTimeValidator;
+    private final AdvisoryTeacherService advisoryTeacherService;
+
 
     // Not :  Save() *********************************************************
     public ResponseMessage<TeacherResponse> saveTeacher(TeacherRequest teacherRequest) {
@@ -52,9 +58,11 @@ public class TeacherService {
         teacher.setLessonsProgramList(lessonProgramSet);
         teacher.setPassword(passwordEncoder.encode(teacher.getPassword()));
 
-        Teacher savedTeacher =  teacherRepository.save(teacher);
+        Teacher savedTeacher = teacherRepository.save(teacher);
 
-        // TODO : AdvisorTeacher Servise yazilinca eklenecek
+        if (teacherRequest.isAdvisorTeacher()){
+            advisoryTeacherService.saveAdvisoryTeacher(teacher);
+        }
 
         return ResponseMessage.<TeacherResponse>builder()
                 .message(SuccessMessages.TEACHER_SAVE)
@@ -67,11 +75,12 @@ public class TeacherService {
 
     // Not : getAll() ***********************************************************************
     public List<TeacherResponse> getAllTeacher() {
-        return  teacherRepository.findAll()
+        return teacherRepository.findAll()
                 .stream()
                 .map(teacherMapper::mapTeacherToTeacherResponse)
                 .collect(Collectors.toList());
     }
+
     // Not : getByName() ***********************************************************************
     public List<TeacherResponse> getTeacherByName(String teacherName) {
         // TODO , bos list ile denencek
@@ -94,11 +103,12 @@ public class TeacherService {
 
     }
 
-    private Teacher isTeacherExist(Long id){
+    private Teacher isTeacherExist(Long id) {
 
-        return teacherRepository.findById(id).orElseThrow(()->
+        return teacherRepository.findById(id).orElseThrow(() ->
                 new ResourceNotFoundException(String.format(ErrorMessages.NOT_FOUND_USER_MESSAGE, id)));
     }
+
     // Not : getById() **********************************************************************
     public ResponseMessage<TeacherResponse> getTeacherById(Long id) {
 
@@ -111,19 +121,20 @@ public class TeacherService {
 
     // Not: getAllWithPage ***********************************************************
     public Page<TeacherResponse> getAllTeacherByPage(int page, int size, String sort, String type) {
-        Pageable pageable =  pageableHelper.getPageableWithProperties(page, size, sort, type);
+        Pageable pageable = pageableHelper.getPageableWithProperties(page, size, sort, type);
         return teacherRepository.findAll(pageable).map(teacherMapper::mapTeacherToTeacherResponse);
     }
+
     // Not: Update() ***************************************************************************
     public ResponseMessage<TeacherResponse> updateTeacher(TeacherRequest teacherRequest, Long userId) {
         //!!! id kontrol
         Teacher teacher = isTeacherExist(userId);
         //!!! LessonProgram
-        Set<LessonProgram> lessonPrograms =  lessonProgramService.getLessonProgramById(teacherRequest.getLessonsIdList());
+        Set<LessonProgram> lessonPrograms = lessonProgramService.getLessonProgramById(teacherRequest.getLessonsIdList());
         // !!! unique kontrol
         uniquePropertyValidator.checkUniqueProperties(teacher, teacherRequest);
         // !!! DTO --> POJO
-        Teacher updatedTeacher = teacherMapper.mapTeacherRequestToUpdatedTeacher(teacherRequest,userId);
+        Teacher updatedTeacher = teacherMapper.mapTeacherRequestToUpdatedTeacher(teacherRequest, userId);
         // !!! eksik datalar setleniyor
         updatedTeacher.setPassword(passwordEncoder.encode(teacherRequest.getPassword()));
         updatedTeacher.setLessonsProgramList(lessonPrograms);
@@ -131,12 +142,36 @@ public class TeacherService {
 
         Teacher savedTeacher = teacherRepository.save(updatedTeacher);
 
-        // TODO : Advisory Teacher
+        advisoryTeacherService.updateAdvisoryTeacher(teacherRequest.isAdvisorTeacher(),savedTeacher);
+
 
         return ResponseMessage.<TeacherResponse>builder()
                 .message(SuccessMessages.TEACHER_UPDATE)
                 .httpStatus(HttpStatus.OK)
                 .object(teacherMapper.mapTeacherToTeacherResponse(savedTeacher))
+                .build();
+    }
+
+    // Not: addLessonProgramsToTeachersLessonsProgram() **********************************
+    public ResponseMessage<TeacherResponse> chooseLesson(ChooseLessonTeacherRequest chooseLessonTeacherRequest) {
+        //!!! Teacher kontrolu
+        Teacher teacher = isTeacherExist(chooseLessonTeacherRequest.getTeacherId());
+        //!!! requestten gelen lessonProgram kontrolu
+        Set<LessonProgram> lessonPrograms = lessonProgramService.getLessonProgramById(chooseLessonTeacherRequest.getLessonProgramId());
+        //!!! teacherin mevcut ders programini aliyoruz
+        Set<LessonProgram> teachersLessonProgram = teacher.getLessonsProgramList();
+
+		// lessonProgram cakisma kontrolu
+        dateTimeValidator.checkLessonPrograms(teachersLessonProgram,lessonPrograms);
+        teachersLessonProgram.addAll(lessonPrograms);
+        teacher.setLessonsProgramList(teachersLessonProgram);
+
+		Teacher updatedTeacher = teacherRepository.save(teacher);
+
+        return ResponseMessage.<TeacherResponse>builder()
+                .message(SuccessMessages.LESSON_PROGRAM_ADD_TO_TEACHER)
+                .httpStatus(HttpStatus.OK)
+                .object(teacherMapper.mapTeacherToTeacherResponse(updatedTeacher))
                 .build();
     }
 }

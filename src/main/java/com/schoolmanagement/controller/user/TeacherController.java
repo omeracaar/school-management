@@ -1,5 +1,6 @@
 package com.schoolmanagement.controller.user;
 
+import com.schoolmanagement.payload.request.ChooseLessonTeacherRequest;
 import com.schoolmanagement.payload.request.TeacherRequest;
 import com.schoolmanagement.payload.response.ResponseMessage;
 import com.schoolmanagement.payload.response.TeacherResponse;
@@ -72,7 +73,12 @@ public class TeacherController {
     }
 	//Not: addLessonProgramsToTeachersLessonsProgram() *****************************************
     @PreAuthorize("hasAnyAuthority('ADMIN','MANAGER','ASSISTANT_MANAGER')")
-    @PostMapping("/chooseLesson") // http://localhost:8080/teachers/chooseLesson
+    @PostMapping("/chooseLesson") // http://localhost:8080/teachers/chooseLesson + POST
+    public ResponseMessage<TeacherResponse> chooseLesson(@RequestBody @Valid ChooseLessonTeacherRequest chooseLessonTeacherRequest){
+
+        return teacherService.chooseLesson(chooseLessonTeacherRequest);
+
+    }
 
 
 
